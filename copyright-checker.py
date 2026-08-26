@@ -1,6 +1,7 @@
 import os
 import re
 import sys
+import requests
 from dotenv import load_dotenv
 from googleapiclient.discovery import build
 from googleapiclient.errors import HttpError
@@ -48,6 +49,7 @@ def check_copyright(video_id: str, youtube):
 
     video = items[0]
     snippet = video["snippet"]
+    
     content_details = video["contentDetails"]
     status = video.get("status", {})
 
@@ -71,6 +73,17 @@ def check_copyright(video_id: str, youtube):
     }
     return report
 
+def get_genre_itunes(title: str):
+    query = f"{title}".strip()
+    response = requests.get(
+        "https://itunes.apple.com/search",
+        params={"term": query, "media": "music", "limit": 1}
+    )
+    results = response.json().get("results", [])
+    if results:
+        return results[0].get("primaryGenreName")
+    return None
+
 
 def print_report(report: dict):
     free_to_use = False
@@ -79,6 +92,7 @@ def print_report(report: dict):
     print(f"Published Date : {report['published_date']}")
     print(f"Channel        : {report['channel']}")
     print(f"Video URL      : {report['url']}")
+    print(f"Genre          : {get_genre_itunes(report["title"])}")
     print(f"Video License  : {report['video_license']}")
     print(f"Category ID    : {report['category_id']}")
     print(f"Made For Kids  : {report['made_for_kids']}")
@@ -120,6 +134,7 @@ def print_report(report: dict):
         )
 
     print("=" * 60 + "\n")
+
 
 
 def main():

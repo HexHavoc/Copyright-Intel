@@ -51,6 +51,8 @@ def check_copyright(video_id: str, youtube):
     content_details = video["contentDetails"]
     status = video.get("status", {})
 
+
+    video_license = status.get("license")
     is_licensed = content_details.get("licensedContent", False)
 
 
@@ -63,6 +65,7 @@ def check_copyright(video_id: str, youtube):
         "tags": snippet.get("tags", []),
         "category_id": snippet.get("categoryId"),
         "licensed_content": is_licensed,
+        "video_license": video_license,
         "made_for_kids": status.get("madeForKids"),
         "url": f"https://www.youtube.com/watch?v={video_id}",
     }
@@ -76,6 +79,7 @@ def print_report(report: dict):
     print(f"Published Date : {report['published_date']}")
     print(f"Channel        : {report['channel']}")
     print(f"Video URL      : {report['url']}")
+    print(f"Video License  : {report['video_license']}")
     print(f"Category ID    : {report['category_id']}")
     print(f"Made For Kids  : {report['made_for_kids']}")
 
@@ -84,18 +88,32 @@ def print_report(report: dict):
     free_use_keywords = [
     "free to use", "royalty free", "no copyright", "copyright free",
     "free download", "music promoted by", "attribution required",
-    "must credit", "you are free to use this song"
+    "must credit", "you are free to use this song", "please add this in your description"
     ]
 
     for i in free_use_keywords:
         if i in report["description"]:
             free_to_use = True 
 
-    if report["licensed_content"]:
-        print("Copyright Status : COPYRIGHTED (Content ID claim detected)")
         
+    if report["video_license"] == "creativeCommon":
+        print("Copyright Status : NOT FLAGGED (no Content ID claim detected)")
+        print(
+            "\nNote: This indicates no known Content ID claim at the time "
+            "of checking. It is not a legal guarantee of copyright-free status."
+        )
+
+    elif report["licensed_content"] and free_to_use:
+        print("This content is claimed by a rights holder"
+              " but the description suggests it may be usable with attribution" 
+              " Read the video description carefully for exact terms before using.")
+
+    elif report["licensed_content"]:
+        print("Copyright Status : COPYRIGHTED (Content ID claim detected)")
+
     else:
         print("Copyright Status : NOT FLAGGED (no Content ID claim detected)")
+
         print(
             "\nNote: This indicates no known Content ID claim at the time "
             "of checking. It is not a legal guarantee of copyright-free status."

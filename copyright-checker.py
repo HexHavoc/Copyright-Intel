@@ -53,9 +53,11 @@ def check_copyright(video_id: str, youtube):
 
     is_licensed = content_details.get("licensedContent", False)
 
+
     report = {
         "video_id": video_id,
         "title": snippet.get("title"),
+        "published_date":snippet.get("publishedAt"),
         "channel": snippet.get("channelTitle"),
         "description": snippet.get("description", ""),
         "tags": snippet.get("tags", []),
@@ -68,12 +70,26 @@ def check_copyright(video_id: str, youtube):
 
 
 def print_report(report: dict):
+    free_to_use = False
     print("\n" + "=" * 60)
-    print(f"Title      : {report['title']}")
-    print(f"Channel    : {report['channel']}")
-    print(f"Video URL  : {report['url']}")
-    print(f"Category ID: {report['category_id']}")
+    print(f"Title          : {report['title']}")
+    print(f"Published Date : {report['published_date']}")
+    print(f"Channel        : {report['channel']}")
+    print(f"Video URL      : {report['url']}")
+    print(f"Category ID    : {report['category_id']}")
+    print(f"Made For Kids  : {report['made_for_kids']}")
+
     print("-" * 60)
+
+    free_use_keywords = [
+    "free to use", "royalty free", "no copyright", "copyright free",
+    "free download", "music promoted by", "attribution required",
+    "must credit", "you are free to use this song"
+    ]
+
+    for i in free_use_keywords:
+        if i in report["description"]:
+            free_to_use = True 
 
     if report["licensed_content"]:
         print("Copyright Status : COPYRIGHTED (Content ID claim detected)")

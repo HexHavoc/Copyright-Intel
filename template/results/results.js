@@ -76,7 +76,7 @@ document.addEventListener('DOMContentLoaded', () => {
             <p class="rec-channel">${rec.channel}</p>
           </div>
         </div>
-        <span class="rec-free-tag">ROYALTY FREE</span>
+        <span class="rec-free-tag">COPYRIGHT FREE</span>
       `;
       recsList.appendChild(row);
     });

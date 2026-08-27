@@ -151,7 +151,7 @@ def decide_verdict(video: dict):
    
     return {
         "verdict": "clear",
-        "badge_text": "Not flagged",
+        "badge_text": "Not Copyrighted",
         "message": (
             "Copyright Status: NOT FLAGGED (no Content ID claim detected). "
             "Note: This indicates no known Content ID claim at the time of "

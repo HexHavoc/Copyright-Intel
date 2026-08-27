@@ -20,7 +20,7 @@ document.addEventListener('DOMContentLoaded', () => {
   const storedData = sessionStorage.getItem('auditResult');
 
   if (!storedData) {
-    // If user opens results.html directly without querying, redirect back
+
     window.location.href = '../index.html';
     return;
   }

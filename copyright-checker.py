@@ -109,6 +109,8 @@ def get_genre(song_title: str):
 
 def decide_verdict(video: dict):
 
+    free_use = False
+
     description_lower = video["description"].lower()
     for i in free_use_keywords:
         if i in description_lower:
@@ -159,54 +161,68 @@ def decide_verdict(video: dict):
 
 
 
-def find_alternatives(genre: str):
-   
-    if genre is None:
+import re
+
+def clean_song_title(raw_title: str) -> str:
+    """Strips out official tags, parentheses, and noise to isolate song name + artist."""
+    cleaned = re.sub(r"\(.*?\)|\[.*?\]", "", raw_title)
+    cleaned = re.sub(r"(?i)\b(official video|official audio|music video|lyrics|ft\.|feat\.)\b", "", cleaned)
+    return " ".join(cleaned.split()).strip()
+
+def search_youtube_alternatives(query: str, max_results: int = 3):
+    """Executes search on YouTube Data API for royalty-free / creative common matches."""
+    try:
+        request = youtube.search().list(
+            part="snippet",
+            type="video",
+            q=query,
+            maxResults=max_results,
+        )
+        response = request.execute()
+        
+        alternatives = []
+        for item in response.get("items", []):
+            alternatives.append({
+                "title": item["snippet"]["title"],
+                "channel": item["snippet"]["channelTitle"],
+                "url": "https://www.youtube.com/watch?v=" + item["id"]["videoId"],
+            })
+        return alternatives
+    except Exception:
         return []
 
-    request = youtube.search().list(
-        part="snippet",
-        type="video",
-        q=f"{genre} royalty free music no copyright",
-        maxResults=3,
-    )
-    response = request.execute()
+def find_alternatives(song_title: str, genre: str):
 
-    alternatives = []
-    for item in response["items"]:
-        alternatives.append({
-            "title": item["snippet"]["title"],
-            "channel": item["snippet"]["channelTitle"],
-            "url": "https://www.youtube.com/watch?v=" + item["id"]["videoId"],
-        })
+    clean_title = clean_song_title(song_title)
+    
+    specific_query = f"{clean_title} slowed reverb no copyright royalty free"
+    recommendations = search_youtube_alternatives(specific_query, max_results=3)
 
-    return alternatives
+    if not recommendations:
+        fallback_genre = genre if genre else "Ambient"
+        genre_query = f"{fallback_genre} royalty free music no copyright"
+        recommendations = search_youtube_alternatives(genre_query, max_results=3)
 
+    return recommendations
 
 
 
 @app.post("/api/check")
 def check_song(payload: CheckRequest):
-  
     video_id = extract_video_id(payload.url)
     if video_id is None:
-        raise HTTPException(status_code=400, detail="That doesn't look like a valid YouTube URL.")
-
+        raise HTTPException(status_code=400, detail="Invalid YouTube URL.")
 
     video = get_video_details(video_id)
-
-    
     genre = get_genre(video["title"])
-
     verdict = decide_verdict(video)
 
 
     if verdict["verdict"] == "claim":
-        alternatives = find_alternatives(genre)
+        alternatives = find_alternatives(video["title"], genre)
     else:
         alternatives = []
 
-    
     return {
         "title": video["title"],
         "published_date": video["published_date"],
@@ -218,7 +234,7 @@ def check_song(payload: CheckRequest):
         "verdict": verdict["verdict"],
         "badge_text": verdict["badge_text"],
         "message": verdict["message"],
-        "license_note": video["video_license"] or "Standard YouTube license",
+        "license_note": video["video_license"] or "Standard YouTube License",
     }
 
 

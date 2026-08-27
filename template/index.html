@@ -14,8 +14,7 @@
 <div class="bg-glow" aria-hidden="true"></div>
 <div class="bg-grid" aria-hidden="true"></div>
 
-<div class="page">
-  <!-- Header -->
+<div class="page landing-page">
   <header class="header">
     <div class="brand-row">
       <div class="logo-box">
@@ -29,95 +28,18 @@
     </p>
   </header>
 
-  <!-- Search Input Bar -->
   <div class="input-bar">
     <svg class="search-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>
     <input id="urlInput" type="text" placeholder="https://www.youtube.com/watch?v=..." class="url-input" spellcheck="false" autocomplete="off" />
     <button id="checkBtn" class="check-btn">
-      <span>Check Track</span>
+      <span>Analyze Track</span>
       <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
     </button>
   </div>
   <div id="errorMsg" class="error-msg hidden"></div>
 
-  <!-- Audio Waveform Visualizer -->
   <div id="waveformWrap" class="waveform state-idle" aria-hidden="true"></div>
 
-  <!-- Main Analysis Results -->
-  <div id="results" class="results hidden">
-    <div class="result-card">
-      <div class="result-top">
-        <div class="result-meta">
-          <span class="sub-label">Track Analysis</span>
-          <h2 id="resTitle" class="result-title">—</h2>
-          <p id="resChannel" class="result-channel">—</p>
-        </div>
-        <span id="verdictBadge" class="badge"><i class="dot"></i>—</span>
-      </div>
-
-      <!-- Verdict Banner Box -->
-      <div class="verdict-banner">
-        <div class="verdict-icon">
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>
-        </div>
-        <p id="verdictMessage" class="verdict-message"></p>
-      </div>
-
-      <!-- Uncongested Metadata Grid -->
-      <div class="meta-grid">
-        <div class="meta-item">
-          <span class="meta-label">
-            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 18V5l12-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="18" cy="16" r="3"/></svg>
-            Genre
-          </span>
-          <span id="genreVal" class="meta-val highlight">—</span>
-        </div>
-
-        <div class="meta-item">
-          <span class="meta-label">
-            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
-            Release Date
-          </span>
-          <span id="publishedVal" class="meta-val">—</span>
-        </div>
-
-        <div class="meta-item">
-          <span class="meta-label">
-            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 15s1-1 4-1 5 2 8 2 4-1 4-1V3s-1 1-4 1-5-2-8-2-4 1-4 1z"/><line x1="4" y1="22" x2="4" y2="15"/></svg>
-            License Type
-          </span>
-          <span id="licenseVal" class="meta-val">—</span>
-        </div>
-
-        <div class="meta-item">
-          <span class="meta-label">
-            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="7" width="20" height="14" rx="2" ry="2"/><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"/></svg>
-            Category
-          </span>
-          <span id="categoryVal" class="meta-val">—</span>
-        </div>
-
-        <div class="meta-item full-width">
-          <span class="meta-label">
-            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M8 14s1.5 2 4 2 4-2 4-2"/><line x1="9" y1="9" x2="9.01" y2="9"/><line x1="15" y1="9" x2="15.01" y2="9"/></svg>
-            Audience Rating
-          </span>
-          <span id="kidsVal" class="meta-val">—</span>
-        </div>
-      </div>
-    </div>
-
-    <!-- Recommendations Section -->
-    <div id="recsWrap" class="recs-wrap hidden">
-      <div class="recs-header">
-        <span class="signal-dot"></span>
-        <h3 class="recs-heading">Recommended Royalty-Free Alternatives</h3>
-      </div>
-      <div id="recsList" class="recs-list"></div>
-    </div>
-  </div>
-
-  <!-- Footer -->
   <footer class="footer">
     <div class="footer-status">
       <span class="pulse-dot"></span>

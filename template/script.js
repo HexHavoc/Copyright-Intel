@@ -50,16 +50,21 @@ function hideError() {
 }
 
 function renderResult(data) {
+  // Title and Channel Information
   document.getElementById('resTitle').textContent = data.title || 'Untitled Track';
-  document.getElementById('resChannel').textContent = data.channel ? `Channel: ${data.channel}` : 'Unknown Channel';
+  document.getElementById('resChannel').textContent = data.channel ? `Uploaded by ${data.channel}` : 'Unknown Creator';
 
+  // Badge Status
   const badge = document.getElementById('verdictBadge');
   badge.innerHTML = `<i class="dot"></i>${data.badge_text}`;
   badge.className = `badge badge-${data.verdict}`;
 
+  // Verdict Explanation Message
   document.getElementById('verdictMessage').textContent = data.message;
-  document.getElementById('genreTag').textContent = data.genre ? `Genre: ${data.genre}` : 'Genre: Unknown';
-  document.getElementById('licenseTag').textContent = `License: ${data.license_note}`;
+
+  // Metadata Grid Population
+  document.getElementById('genreVal').textContent = data.genre || 'Unspecified';
+  document.getElementById('licenseVal').textContent = data.license_note || 'Standard License';
 
   if (data.published_date) {
     const formattedDate = new Date(data.published_date).toLocaleDateString('en-US', {
@@ -67,16 +72,19 @@ function renderResult(data) {
       month: 'short',
       day: 'numeric'
     });
-    document.getElementById('publishedTag').textContent = `Released: ${formattedDate}`;
+    document.getElementById('publishedVal').textContent = formattedDate;
   } else {
-    document.getElementById('publishedTag').textContent = 'Released: Unknown';
+    document.getElementById('publishedVal').textContent = 'Unknown';
   }
 
-  const categoryName = YOUTUBE_CATEGORIES[data.category_id] || `Category ID: ${data.category_id}`;
-  document.getElementById('categoryTag').textContent = `Category: ${categoryName}`;
+  const categoryName = YOUTUBE_CATEGORIES[data.category_id] || `ID #${data.category_id}`;
+  document.getElementById('categoryVal').textContent = categoryName;
 
-  document.getElementById('kidsTag').textContent = data.made_for_kids ? 'Made for Kids: Yes' : 'Made for Kids: No';
+  document.getElementById('kidsVal').textContent = data.made_for_kids
+    ? 'Designed specifically for Children (COPPA strict)'
+    : 'Standard Audience / General Content';
 
+  // Alternative Recommendations
   const recsWrap = document.getElementById('recsWrap');
   const recsList = document.getElementById('recsList');
   recsList.innerHTML = '';
@@ -91,13 +99,13 @@ function renderResult(data) {
       row.className = "rec-row";
       row.innerHTML = `
         <div class="rec-info">
-          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="5 3 19 12 5 21 5 3"/></svg>
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><polygon points="5 3 19 12 5 21 5 3"/></svg>
           <div>
             <p class="rec-title">${rec.title}</p>
             <p class="rec-channel">${rec.channel}</p>
           </div>
         </div>
-        <span class="rec-free-tag">FREE</span>
+        <span class="rec-free-tag">ROYALTY FREE</span>
       `;
       recsList.appendChild(row);
     });
@@ -118,7 +126,7 @@ async function runCheck() {
   hideError();
   results.classList.add('hidden');
   checkBtn.disabled = true;
-  checkBtn.querySelector('span').textContent = "Checking...";
+  checkBtn.querySelector('span').textContent = "Analyzing...";
   setWaveformState('idle');
 
   try {
@@ -140,7 +148,7 @@ async function runCheck() {
     showError(err.message || "Failed to reach server. Ensure FastAPI is running on port 8000.");
   } finally {
     checkBtn.disabled = false;
-    checkBtn.querySelector('span').textContent = "Check";
+    checkBtn.querySelector('span').textContent = "Analyze Track";
   }
 }
 

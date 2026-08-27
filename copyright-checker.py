@@ -160,51 +160,85 @@ def decide_verdict(video: dict):
     }
 
 
-
-import re
-
 def clean_song_title(raw_title: str) -> str:
-    """Strips out official tags, parentheses, and noise to isolate song name + artist."""
+   
     cleaned = re.sub(r"\(.*?\)|\[.*?\]", "", raw_title)
     cleaned = re.sub(r"(?i)\b(official video|official audio|music video|lyrics|ft\.|feat\.)\b", "", cleaned)
     return " ".join(cleaned.split()).strip()
 
-def search_youtube_alternatives(query: str, max_results: int = 3):
-    """Executes search on YouTube Data API for royalty-free / creative common matches."""
+
+def is_safe_alternative(video_item: dict) -> bool:
+    
+    video_id = video_item["id"]["videoId"]
     try:
+        # Fetch status and license metadata for candidate video
+        request = youtube.videos().list(
+            part="snippet,contentDetails,status",
+            id=video_id
+        )
+        response = request.execute()
+        if not response.get("items"):
+            return False
+
+        item = response["items"][0]
+        temp_video_data = {
+            "title": item["snippet"]["title"],
+            "description": item["snippet"]["description"],
+            "licensed_content": item["contentDetails"]["licensedContent"],
+            "video_license": item["status"].get("license"),
+        }
+
+        # Check against verdict rules
+        verdict = decide_verdict(temp_video_data)
+        return verdict["verdict"] != "claim"
+    except Exception:
+        return False
+
+
+def search_and_verify_alternatives(query: str, needed_count: int = 3):
+    
+    try:
+        # Search candidate pool
         request = youtube.search().list(
             part="snippet",
             type="video",
             q=query,
-            maxResults=max_results,
+            maxResults=10,
         )
         response = request.execute()
-        
-        alternatives = []
+
+        verified_alternatives = []
         for item in response.get("items", []):
-            alternatives.append({
-                "title": item["snippet"]["title"],
-                "channel": item["snippet"]["channelTitle"],
-                "url": "https://www.youtube.com/watch?v=" + item["id"]["videoId"],
-            })
-        return alternatives
+            if is_safe_alternative(item):
+                verified_alternatives.append({
+                    "title": item["snippet"]["title"],
+                    "channel": item["snippet"]["channelTitle"],
+                    "url": "https://www.youtube.com/watch?v=" + item["id"]["videoId"],
+                })
+                if len(verified_alternatives) >= needed_count:
+                    break
+
+        return verified_alternatives
     except Exception:
         return []
 
+
 def find_alternatives(song_title: str, genre: str):
-
-    clean_title = clean_song_title(song_title)
     
-    specific_query = f"{clean_title} slowed reverb no copyright royalty free"
-    recommendations = search_youtube_alternatives(specific_query, max_results=3)
+    clean_title = clean_song_title(song_title)
 
-    if not recommendations:
+
+    specific_query = f"{clean_title} slowed reverb no copyright royalty free"
+    recommendations = search_and_verify_alternatives(specific_query, needed_count=3)
+
+    
+    if len(recommendations) < 3:
         fallback_genre = genre if genre else "Ambient"
         genre_query = f"{fallback_genre} royalty free music no copyright"
-        recommendations = search_youtube_alternatives(genre_query, max_results=3)
+        fallback_recs = search_and_verify_alternatives(genre_query, needed_count=3 - len(recommendations))
+        recommendations.extend(fallback_recs)
 
     return recommendations
-
 
 
 @app.post("/api/check")

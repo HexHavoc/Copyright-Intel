@@ -1,0 +1,46 @@
+/* Navigation bar for results page */
+.top-nav {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 32px;
+}
+
+.back-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 12.5px;
+  color: var(--text-dim);
+  text-decoration: none;
+  padding: 8px 14px;
+  border-radius: 8px;
+  background: var(--surface);
+  border: 1px solid var(--line);
+  transition: all 0.2s ease;
+}
+
+.back-link:hover {
+  color: var(--text);
+  border-color: var(--accent);
+  background: var(--surface-hover);
+  transform: translateX(-2px);
+}
+
+.brand-pill {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 11px;
+  color: var(--accent);
+  background: rgba(99, 128, 255, 0.12);
+  border: 1px solid rgba(99, 128, 255, 0.25);
+  padding: 4px 10px;
+  border-radius: 6px;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.waveform.state-active span {
+  background: var(--accent);
+  opacity: 0.9;
+}

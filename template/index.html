@@ -1,43 +1,49 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>Copyright-Intel</title>
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="styles.css">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Copyright-Intel | Audio Rights & Analytics</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&family=Space+Grotesk:wght@500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css">
 </head>
 <body>
 
-<div class="page">
+<div class="bg-glow" aria-hidden="true"></div>
+<div class="bg-grid" aria-hidden="true"></div>
 
+<div class="page">
   <!-- Header -->
   <header class="header">
     <div class="brand-row">
       <div class="logo-box">
-        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 18V5l12-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="18" cy="16" r="3"/></svg>
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M9 18V5l12-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="18" cy="16" r="3"/></svg>
       </div>
       <span class="brand-label">Copyright-Intel</span>
     </div>
-    <h1 class="headline">Know before you upload.</h1>
+    <h1 class="headline">Know before<br>you upload.</h1>
     <p class="subhead">
-      Paste a YouTube link. We check its claim status, surface the genre, and line up copyright-free alternatives if it's flagged.
+      Analyze YouTube audio licensing, track release metadata, evaluate copyright claims, and discover safe alternatives.
     </p>
   </header>
 
   <!-- Input bar -->
   <div class="input-bar">
-    <svg class="search-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>
-    <input id="urlInput" type="text" placeholder="https://www.youtube.com/watch?v=..." class="url-input" />
-    <button id="checkBtn" class="check-btn">Check</button>
+    <svg class="search-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>
+    <input id="urlInput" type="text" placeholder="https://www.youtube.com/watch?v=..." class="url-input" spellcheck="false" autocomplete="off" />
+    <button id="checkBtn" class="check-btn">
+      <span>Check</span>
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
+    </button>
   </div>
   <div id="errorMsg" class="error-msg hidden"></div>
 
   <!-- Waveform state indicator -->
   <div id="waveformWrap" class="waveform state-idle" aria-hidden="true"></div>
 
-  <!-- Results -->
+  <!-- Results Section -->
   <div id="results" class="results hidden">
     <div class="result-card">
       <div class="result-top">
@@ -45,14 +51,20 @@
           <h2 id="resTitle" class="result-title">—</h2>
           <p id="resChannel" class="result-channel">—</p>
         </div>
-        <span id="verdictBadge" class="badge">—</span>
+        <span id="verdictBadge" class="badge"><i class="dot"></i>—</span>
       </div>
+
+      <div class="divider"></div>
 
       <p id="verdictMessage" class="verdict-message"></p>
 
+      <!-- Metadata Display Tags -->
       <div class="tag-row">
-        <span id="genreTag" class="tag tag-violet"></span>
+        <span id="genreTag" class="tag tag-accent"></span>
         <span id="licenseTag" class="tag tag-dim"></span>
+        <span id="publishedTag" class="tag tag-dim"></span>
+        <span id="categoryTag" class="tag tag-dim"></span>
+        <span id="kidsTag" class="tag tag-dim"></span>
       </div>
     </div>
 
@@ -66,9 +78,8 @@
   <!-- Footer -->
   <footer class="footer">
     <span class="footer-text">Copyright-Intel · YouTube Data API v3</span>
-    <span class="footer-text">Verdicts are indicators, not legal advice</span>
+    <span class="footer-text">Automated indicators · Not legal advice</span>
   </footer>
-
 </div>
 
 <script src="script.js"></script>

@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Copyright-Intel</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+<div class="page">
+
+  <!-- Header -->
+  <header class="header">
+    <div class="brand-row">
+      <div class="logo-box">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 18V5l12-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="18" cy="16" r="3"/></svg>
+      </div>
+      <span class="brand-label">Copyright-Intel</span>
+    </div>
+    <h1 class="headline">Know before you upload.</h1>
+    <p class="subhead">
+      Paste a YouTube link. We check its claim status, surface the genre, and line up copyright-free alternatives if it's flagged.
+    </p>
+  </header>
+
+  <!-- Input bar -->
+  <div class="input-bar">
+    <svg class="search-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>
+    <input id="urlInput" type="text" placeholder="https://www.youtube.com/watch?v=..." class="url-input" />
+    <button id="checkBtn" class="check-btn">Check</button>
+  </div>
+  <div id="errorMsg" class="error-msg hidden"></div>
+
+  <!-- Waveform state indicator -->
+  <div id="waveformWrap" class="waveform state-idle" aria-hidden="true"></div>
+
+  <!-- Results -->
+  <div id="results" class="results hidden">
+    <div class="result-card">
+      <div class="result-top">
+        <div class="result-meta">
+          <h2 id="resTitle" class="result-title">—</h2>
+          <p id="resChannel" class="result-channel">—</p>
+        </div>
+        <span id="verdictBadge" class="badge">—</span>
+      </div>
+
+      <p id="verdictMessage" class="verdict-message"></p>
+
+      <div class="tag-row">
+        <span id="genreTag" class="tag tag-violet"></span>
+        <span id="licenseTag" class="tag tag-dim"></span>
+      </div>
+    </div>
+
+    <!-- Recommendations -->
+    <div id="recsWrap" class="recs-wrap hidden">
+      <h3 class="recs-heading"><span class="signal-mark">◆</span> Copyright-free alternatives, same genre</h3>
+      <div id="recsList" class="recs-list"></div>
+    </div>
+  </div>
+
+  <!-- Footer -->
+  <footer class="footer">
+    <span class="footer-text">Copyright-Intel · YouTube Data API v3</span>
+    <span class="footer-text">Verdicts are indicators, not legal advice</span>
+  </footer>
+
+</div>
+
+<script src="script.js"></script>
+</body>
+</html>

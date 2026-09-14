@@ -1,12 +1,17 @@
+import asyncio
 import os
 import re
-import requests
 
+import requests
 from dotenv import load_dotenv
 from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from googleapiclient.discovery import build
 from pydantic import BaseModel
+
+# Reusing the recording + recognition logic from song_recognizer.py
+# instead of duplicating it here.
+from song_recognizer import record_clip, identify_song
 
 
 load_dotenv()
@@ -241,16 +246,16 @@ def find_alternatives(song_title: str, genre: str):
     return recommendations
 
 
-@app.post("/api/check")
-def check_song(payload: CheckRequest):
-    video_id = extract_video_id(payload.url)
-    if video_id is None:
-        raise HTTPException(status_code=400, detail="Invalid YouTube URL.")
-
+def run_check_pipeline(video_id: str):
+    """
+    The shared logic used by BOTH /api/check (URL) and /api/recognize (mic):
+    given a video ID, fetch its details and return the full verdict response.
+    Pulling this into one function means URL-checks and mic-recognitions
+    can never accidentally behave differently.
+    """
     video = get_video_details(video_id)
     genre = get_genre(video["title"])
     verdict = decide_verdict(video)
-
 
     if verdict["verdict"] == "claim":
         alternatives = find_alternatives(video["title"], genre)
@@ -270,6 +275,64 @@ def check_song(payload: CheckRequest):
         "message": verdict["message"],
         "license_note": video["video_license"] or "Standard YouTube License",
     }
+
+
+def find_best_youtube_match(title: str, artist: str):
+    """Shazam gives us a title + artist, not a YouTube video — search for it."""
+    query = f"{artist} {title}".strip()
+
+    request = youtube.search().list(
+        part="snippet",
+        type="video",
+        q=query,
+        maxResults=1,
+    )
+    response = request.execute()
+
+    items = response.get("items", [])
+    if not items:
+        return None
+
+    return items[0]["id"]["videoId"]
+
+
+@app.post("/api/check")
+def check_song(payload: CheckRequest):
+    video_id = extract_video_id(payload.url)
+    if video_id is None:
+        raise HTTPException(status_code=400, detail="Invalid YouTube URL.")
+
+    return run_check_pipeline(video_id)
+
+
+@app.post("/api/recognize")
+def recognize_song(seconds: int = 8):
+    """
+    Records a clip from the server's microphone, identifies it via
+    Shazam (using song_recognizer.py), then runs it through the exact
+    same check pipeline as /api/check.
+    """
+    clip_path = record_clip(seconds)
+
+    try:
+        match = asyncio.run(identify_song(clip_path))
+    finally:
+        os.remove(clip_path)
+
+    if match is None:
+        raise HTTPException(status_code=404, detail="Couldn't identify the song. Try again with a clearer recording.")
+
+    video_id = find_best_youtube_match(match["title"], match["artist"])
+    if video_id is None:
+        raise HTTPException(
+            status_code=404,
+            detail=f"Identified '{match['title']}' by {match['artist']}, but couldn't find it on YouTube."
+        )
+
+    result = run_check_pipeline(video_id)
+    result["recognized_via"] = "microphone"
+    result["shazam_match"] = match
+    return result
 
 
 @app.get("/health")

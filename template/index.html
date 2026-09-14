@@ -28,14 +28,51 @@
     </p>
   </header>
 
-  <div class="input-bar">
-    <svg class="search-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>
-    <input id="urlInput" type="text" placeholder="https://www.youtube.com/watch?v=..." class="url-input" spellcheck="false" autocomplete="off" />
-    <button id="checkBtn" class="check-btn">
-      <span>Analyze Track</span>
-      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
+  <!-- Mode switcher -->
+  <div class="mode-tabs" role="tablist">
+    <button class="mode-tab active" data-mode="url" role="tab" aria-selected="true">
+      <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>
+      Paste URL
+    </button>
+    <button class="mode-tab" data-mode="mic" role="tab" aria-selected="false">
+      <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/><line x1="12" y1="19" x2="12" y2="23"/><line x1="8" y1="23" x2="16" y2="23"/></svg>
+      Listen for Song
     </button>
   </div>
+
+  <!-- URL panel -->
+  <div id="urlPanel" class="mode-panel">
+    <div class="input-bar">
+      <svg class="search-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>
+      <input id="urlInput" type="text" placeholder="https://www.youtube.com/watch?v=..." class="url-input" spellcheck="false" autocomplete="off" />
+      <button id="checkBtn" class="check-btn">
+        <span>Analyze Track</span>
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
+      </button>
+    </div>
+  </div>
+
+  <!-- Mic panel -->
+  <div id="micPanel" class="mode-panel hidden">
+    <div class="mic-bar">
+      <div class="mic-left">
+        <button id="micBtn" class="mic-btn" aria-label="Start listening">
+          <span class="mic-ring"></span>
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/><line x1="12" y1="19" x2="12" y2="23"/><line x1="8" y1="23" x2="16" y2="23"/></svg>
+        </button>
+        <div class="mic-copy">
+          <p id="micStatus" class="mic-status">Tap to listen</p>
+          <p class="mic-hint">Play the song near your mic — we'll capture 8 seconds</p>
+        </div>
+      </div>
+      <select id="micSeconds" class="mic-seconds">
+        <option value="8">8s</option>
+        <option value="12">12s</option>
+        <option value="20">20s</option>
+      </select>
+    </div>
+  </div>
+
   <div id="errorMsg" class="error-msg hidden"></div>
 
   <div id="waveformWrap" class="waveform state-idle" aria-hidden="true"></div>

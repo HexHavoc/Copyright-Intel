@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Discover | Copyright-Intel</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&family=Space+Grotesk:wght@500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../styles.css">
+</head>
+<body>
+
+<div class="bg-glow" aria-hidden="true"></div>
+<div class="bg-grid" aria-hidden="true"></div>
+
+<div class="page">
+  <header class="header">
+    <div class="brand-row">
+      <div class="logo-box">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M9 18V5l12-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="18" cy="16" r="3"/></svg>
+      </div>
+      <span class="brand-label">Copyright-Intel</span>
+    </div>
+    <nav class="top-nav">
+      <a href="../index.html" class="nav-link">Check</a>
+      <a href="discover.html" class="nav-link active">Discover</a>
+      <a href="../analytics/analytics.html" class="nav-link">Analytics</a>
+    </nav>
+    <h1 class="headline analytics-headline">Find music by mood.</h1>
+    <p class="subhead">Type a theme or feeling — Christmas, lofi, workout, heartbreak — and get back tracks that are already safe to use.</p>
+  </header>
+
+  <!-- Search bar -->
+  <div class="input-bar">
+    <svg class="search-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>
+    <input id="moodInput" type="text" placeholder="e.g. christmas, lofi study, workout hype..." class="url-input" spellcheck="false" autocomplete="off" />
+    <button id="discoverBtn" class="check-btn">
+      <span>Discover</span>
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
+    </button>
+  </div>
+
+  <!-- Quick mood chips -->
+  <div class="chip-row">
+    <button class="chip" data-mood="christmas">🎄 Christmas</button>
+    <button class="chip" data-mood="lofi study">📚 Lofi Study</button>
+    <button class="chip" data-mood="workout hype">🏋️ Workout</button>
+    <button class="chip" data-mood="chill acoustic">🌿 Chill</button>
+    <button class="chip" data-mood="sad heartbreak">💔 Heartbreak</button>
+    <button class="chip" data-mood="party upbeat">🎉 Party</button>
+  </div>
+
+  <div id="errorMsg" class="error-msg hidden"></div>
+  <div id="waveformWrap" class="waveform state-idle" aria-hidden="true"></div>
+
+  <!-- Results -->
+  <div id="resultsWrap" class="hidden">
+    <div class="recs-header" style="margin-top: 8px;">
+      <span class="signal-dot"></span>
+      <span id="resultsHeading" class="recs-heading">Results</span>
+    </div>
+    <div id="resultsList" class="recs-list"></div>
+  </div>
+
+  <div id="emptyState" class="empty-state hidden">
+    <p>No safe tracks found for that search. Try a broader mood or genre.</p>
+  </div>
+
+  <footer class="footer">
+    <div class="footer-status">
+      <span class="pulse-dot"></span>
+      <span class="footer-text">YouTube Data API v3 Connected</span>
+    </div>
+    <span class="footer-text">Automated indicators · Not formal legal counsel</span>
+  </footer>
+</div>
+
+<script src="discover.js"></script>
+</body>
+</html>

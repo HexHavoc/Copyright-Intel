@@ -1,6 +1,8 @@
 import asyncio
+import json
 import os
 import re
+from datetime import datetime, timezone
 
 import requests
 from dotenv import load_dotenv
@@ -32,6 +34,47 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
+
+# ============================================================
+# Analytics storage — every check gets logged to a local JSON file
+# ============================================================
+
+HISTORY_PATH = os.path.join(os.path.dirname(__file__), "history.json")
+
+
+def init_db():
+    """Creates an empty history file if one doesn't already exist. Runs once on startup."""
+    if not os.path.exists(HISTORY_PATH):
+        with open(HISTORY_PATH, "w") as f:
+            json.dump([], f)
+
+
+def load_history() -> list:
+    with open(HISTORY_PATH, "r") as f:
+        return json.load(f)
+
+
+def save_history(history: list):
+    with open(HISTORY_PATH, "w") as f:
+        json.dump(history, f, indent=2)
+
+
+def log_check(title: str, channel: str, genre: str, verdict: str, source: str):
+    """Appends one record to history.json. source is 'url' or 'microphone'."""
+    history = load_history()
+    history.append({
+        "title": title,
+        "channel": channel,
+        "genre": genre,
+        "verdict": verdict,
+        "source": source,
+        "checked_at": datetime.now(timezone.utc).isoformat(),
+    })
+    save_history(history)
+
+
+init_db()
 
 
 
@@ -246,7 +289,7 @@ def find_alternatives(song_title: str, genre: str):
     return recommendations
 
 
-def run_check_pipeline(video_id: str):
+def run_check_pipeline(video_id: str, source: str = "url"):
     """
     The shared logic used by BOTH /api/check (URL) and /api/recognize (mic):
     given a video ID, fetch its details and return the full verdict response.
@@ -261,6 +304,16 @@ def run_check_pipeline(video_id: str):
         alternatives = find_alternatives(video["title"], genre)
     else:
         alternatives = []
+
+    # Every check — whether from a pasted URL or a mic recognition —
+    # gets logged here so the analytics tab has something to show.
+    log_check(
+        title=video["title"],
+        channel=video["channel"],
+        genre=genre,
+        verdict=verdict["verdict"],
+        source=source,
+    )
 
     return {
         "title": video["title"],
@@ -296,6 +349,68 @@ def find_best_youtube_match(title: str, artist: str):
     return items[0]["id"]["videoId"]
 
 
+def discover_songs_by_mood(mood: str, limit: int = 8):
+    """
+    Searches YouTube for music matching a mood/theme (e.g. "christmas",
+    "lofi study", "workout hype"), then runs EACH candidate through the
+    exact same decide_verdict() logic used everywhere else — so the
+    results you get back are only ones that are NOT flagged as fully
+    copyrighted (i.e. "clear" or "verify", never "claim").
+    """
+    query = f"{mood} music"
+
+    request = youtube.search().list(
+        part="snippet",
+        type="video",
+        videoCategoryId="10",   # Music category
+        q=query,
+        maxResults=15,          # pull extra candidates since some will get filtered out
+    )
+    response = request.execute()
+
+    results = []
+    for item in response.get("items", []):
+        video_id = item["id"]["videoId"]
+
+        try:
+            video = get_video_details(video_id)
+        except HTTPException:
+            continue  # skip videos that failed to load details
+
+        verdict = decide_verdict(video)
+        if verdict["verdict"] == "claim":
+            continue  # skip anything fully copyrighted — only want safe results here
+
+        genre = get_genre(video["title"])
+
+        results.append({
+            "title": video["title"],
+            "channel": video["channel"],
+            "url": f"https://www.youtube.com/watch?v={video_id}",
+            "verdict": verdict["verdict"],
+            "badge_text": verdict["badge_text"],
+            "genre": genre,
+        })
+
+        if len(results) >= limit:
+            break
+
+    return results
+
+
+@app.get("/api/discover")
+def discover_by_mood(mood: str, limit: int = 8):
+    """
+    GET /api/discover?mood=christmas
+    GET /api/discover?mood=lofi+study&limit=10
+    """
+    if not mood or not mood.strip():
+        raise HTTPException(status_code=400, detail="Please provide a mood or theme to search for.")
+
+    results = discover_songs_by_mood(mood.strip(), limit)
+    return {"mood": mood, "results": results}
+
+
 @app.post("/api/check")
 def check_song(payload: CheckRequest):
     video_id = extract_video_id(payload.url)
@@ -329,7 +444,7 @@ def recognize_song(seconds: int = 8):
             detail=f"Identified '{match['title']}' by {match['artist']}, but couldn't find it on YouTube."
         )
 
-    result = run_check_pipeline(video_id)
+    result = run_check_pipeline(video_id, source="microphone")
     result["recognized_via"] = "microphone"
     result["shazam_match"] = match
     return result
@@ -338,3 +453,141 @@ def recognize_song(seconds: int = 8):
 @app.get("/health")
 def health_check():
     return {"status": "ok"}
+
+
+def discover_by_mood(mood: str, limit: int = 9):
+    """
+    Searches YouTube for music matching a mood/theme (e.g. "christmas",
+    "lofi study"), then runs EVERY candidate through the exact same
+    decide_verdict() pipeline used for a pasted URL — so results only
+    ever include "clear" or "verify" tracks, never copyrighted ones.
+    """
+    # Searching for just "{mood} music" mostly returns mainstream,
+    # commercially-licensed tracks — almost all of which get filtered out
+    # by decide_verdict() below. Biasing the query itself toward
+    # royalty-free content means far more candidates actually pass.
+    queries = [
+        f"{mood} royalty free music no copyright",
+        f"{mood} music no copyright",
+    ]
+
+    candidate_ids = []
+    seen = set()
+
+    for query in queries:
+        search_response = youtube.search().list(
+            part="snippet",
+            type="video",
+            videoCategoryId="10",  # Music category
+            q=query,
+            maxResults=25,
+        ).execute()
+
+        for item in search_response.get("items", []):
+            video_id = item["id"]["videoId"]
+            if video_id not in seen:
+                seen.add(video_id)
+                candidate_ids.append(video_id)
+
+    if not candidate_ids:
+        return []
+
+    # One batched call instead of one call per video — videos().list
+    # accepts up to 50 comma-separated IDs at once.
+    details_response = youtube.videos().list(
+        part="snippet,contentDetails,status",
+        id=",".join(candidate_ids),
+    ).execute()
+
+    results = []
+    for item in details_response.get("items", []):
+        video = {
+            "title": item["snippet"]["title"],
+            "channel": item["snippet"]["channelTitle"],
+            "description": item["snippet"]["description"],
+            "licensed_content": item["contentDetails"]["licensedContent"],
+            "video_license": item["status"].get("license"),
+        }
+
+        verdict = decide_verdict(video)
+        if verdict["verdict"] == "claim":
+            continue  # skip anything copyrighted — this endpoint only surfaces safe tracks
+
+        results.append({
+            "title": video["title"],
+            "channel": video["channel"],
+            "url": f"https://www.youtube.com/watch?v={item['id']}",
+            "verdict": verdict["verdict"],
+            "badge_text": verdict["badge_text"],
+        })
+
+        if len(results) >= limit:
+            break
+
+    return results
+
+
+@app.get("/api/discover")
+def discover_songs(mood: str, limit: int = 9):
+    """
+    GET /api/discover?mood=christmas
+    Returns copyright-free / attribution-required tracks matching the
+    given mood or theme.
+    """
+    if not mood or not mood.strip():
+        raise HTTPException(status_code=400, detail="Mood/concept can't be empty.")
+
+    results = discover_by_mood(mood.strip(), limit)
+    return {"mood": mood.strip(), "results": results}
+
+
+@app.get("/api/analytics")
+def get_analytics():
+    """
+    Returns aggregated stats from every check ever logged:
+        - total checks
+        - how many were clear / verify / claim
+        - top genres checked
+        - checks per day, for the last 7 days
+        - the 10 most recent checks
+    """
+    history = load_history()
+    total = len(history)
+
+    verdict_counts = {"clear": 0, "verify": 0, "claim": 0}
+    genre_counts = {}
+    day_counts = {}
+
+    for record in history:
+        verdict = record.get("verdict")
+        if verdict in verdict_counts:
+            verdict_counts[verdict] += 1
+
+        genre = record.get("genre")
+        if genre:
+            genre_counts[genre] = genre_counts.get(genre, 0) + 1
+
+        day = record["checked_at"][:10]  # "YYYY-MM-DD" from the ISO timestamp
+        day_counts[day] = day_counts.get(day, 0) + 1
+
+    # Top 6 genres, most-checked first
+    top_genres = sorted(
+        ({"genre": g, "count": c} for g, c in genre_counts.items()),
+        key=lambda item: item["count"],
+        reverse=True,
+    )[:6]
+
+    # Last 7 days, oldest to newest
+    sorted_days = sorted(day_counts.items(), reverse=True)[:7]
+    checks_per_day = [{"day": day, "count": count} for day, count in sorted_days][::-1]
+
+    # 10 most recent checks, newest first
+    recent_checks = history[-10:][::-1]
+
+    return {
+        "total_checks": total,
+        "verdict_counts": verdict_counts,
+        "top_genres": top_genres,
+        "checks_per_day": checks_per_day,
+        "recent_checks": recent_checks,
+    }

@@ -773,3 +773,40 @@ body {
   color: var(--text);
   transform: translateY(-1px);
 }
+
+/* Expandable recommendation cards with inline players */
+.rec-card {
+  border-radius: 12px;
+  overflow: hidden;
+}
+
+.rec-row-btn {
+  width: 100%;
+  font-family: inherit;
+  cursor: pointer;
+}
+
+.rec-row-btn.expanded {
+  border-color: var(--accent);
+  border-bottom-left-radius: 0;
+  border-bottom-right-radius: 0;
+}
+
+.rec-player-wrap {
+  border-radius: 0 0 12px 12px;
+  overflow: hidden;
+  border: 1px solid var(--accent);
+  border-top: none;
+  background: #000;
+}
+
+.rec-player-wrap iframe {
+  display: block;
+}
+
+/* Section divider (Analytics page) */
+.section-divider {
+  height: 1px;
+  background: var(--line);
+  margin: 40px 0 28px;
+}

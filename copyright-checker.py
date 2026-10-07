@@ -61,14 +61,27 @@ def save_history(history: list):
 
 
 def log_check(title: str, channel: str, genre: str, verdict: str, source: str):
-    """Appends one record to history.json. source is 'url' or 'microphone'."""
+    """Appends one check record to history.json. source is 'url' or 'microphone'."""
     history = load_history()
     history.append({
+        "type": "check",
         "title": title,
         "channel": channel,
         "genre": genre,
         "verdict": verdict,
         "source": source,
+        "checked_at": datetime.now(timezone.utc).isoformat(),
+    })
+    save_history(history)
+
+
+def log_discovery(mood: str, result_count: int):
+    """Appends one discovery-search record to history.json (separate from checks)."""
+    history = load_history()
+    history.append({
+        "type": "discover",
+        "mood": mood,
+        "result_count": result_count,
         "checked_at": datetime.now(timezone.utc).isoformat(),
     })
     save_history(history)
@@ -261,6 +274,7 @@ def search_and_verify_alternatives(query: str, needed_count: int = 3):
                 verified_alternatives.append({
                     "title": item["snippet"]["title"],
                     "channel": item["snippet"]["channelTitle"],
+                    "video_id": item["id"]["videoId"],
                     "url": "https://www.youtube.com/watch?v=" + item["id"]["videoId"],
                 })
                 if len(verified_alternatives) >= needed_count:
@@ -516,6 +530,7 @@ def discover_by_mood(mood: str, limit: int = 9):
         results.append({
             "title": video["title"],
             "channel": video["channel"],
+            "video_id": item["id"],
             "url": f"https://www.youtube.com/watch?v={item['id']}",
             "verdict": verdict["verdict"],
             "badge_text": verdict["badge_text"],
@@ -538,6 +553,7 @@ def discover_songs(mood: str, limit: int = 9):
         raise HTTPException(status_code=400, detail="Mood/concept can't be empty.")
 
     results = discover_by_mood(mood.strip(), limit)
+    log_discovery(mood=mood.strip(), result_count=len(results))
     return {"mood": mood.strip(), "results": results}
 
 
@@ -552,13 +568,19 @@ def get_analytics():
         - the 10 most recent checks
     """
     history = load_history()
-    total = len(history)
+
+    # Older records (saved before the "type" field existed) have no "type"
+    # key — treat those as "check" records so nothing from before breaks.
+    checks = [r for r in history if r.get("type", "check") == "check"]
+    discoveries = [r for r in history if r.get("type") == "discover"]
+
+    total = len(checks)
 
     verdict_counts = {"clear": 0, "verify": 0, "claim": 0}
     genre_counts = {}
     day_counts = {}
 
-    for record in history:
+    for record in checks:
         verdict = record.get("verdict")
         if verdict in verdict_counts:
             verdict_counts[verdict] += 1
@@ -582,7 +604,28 @@ def get_analytics():
     checks_per_day = [{"day": day, "count": count} for day, count in sorted_days][::-1]
 
     # 10 most recent checks, newest first
-    recent_checks = history[-10:][::-1]
+    recent_checks = checks[-10:][::-1]
+
+    # ---- Discovery tab stats ----
+    total_discoveries = len(discoveries)
+
+    mood_counts = {}
+    total_results_returned = 0
+    for record in discoveries:
+        mood = record.get("mood")
+        if mood:
+            mood_counts[mood] = mood_counts.get(mood, 0) + 1
+        total_results_returned += record.get("result_count", 0)
+
+    top_moods = sorted(
+        ({"mood": m, "count": c} for m, c in mood_counts.items()),
+        key=lambda item: item["count"],
+        reverse=True,
+    )[:6]
+
+    avg_results_per_search = (
+        round(total_results_returned / total_discoveries, 1) if total_discoveries else 0
+    )
 
     return {
         "total_checks": total,
@@ -590,4 +633,7 @@ def get_analytics():
         "top_genres": top_genres,
         "checks_per_day": checks_per_day,
         "recent_checks": recent_checks,
+        "total_discoveries": total_discoveries,
+        "top_moods": top_moods,
+        "avg_results_per_discovery": avg_results_per_search,
     }

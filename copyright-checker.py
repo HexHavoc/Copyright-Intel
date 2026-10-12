@@ -256,7 +256,7 @@ def is_safe_alternative(video_item: dict) -> bool:
         return False
 
 
-def search_and_verify_alternatives(query: str, needed_count: int = 3):
+def search_and_verify_alternatives(query: str, needed_count: int = 5):
     
     try:
         # Search candidate pool
@@ -291,13 +291,13 @@ def find_alternatives(song_title: str, genre: str):
 
 
     specific_query = f"{clean_title} slowed reverb no copyright royalty free"
-    recommendations = search_and_verify_alternatives(specific_query, needed_count=3)
+    recommendations = search_and_verify_alternatives(specific_query, needed_count=5)
 
     
     if len(recommendations) < 3:
         fallback_genre = genre if genre else "Ambient"
         genre_query = f"{fallback_genre} royalty free music no copyright"
-        fallback_recs = search_and_verify_alternatives(genre_query, needed_count=3 - len(recommendations))
+        fallback_recs = search_and_verify_alternatives(genre_query, needed_count=5 - len(recommendations))
         recommendations.extend(fallback_recs)
 
     return recommendations

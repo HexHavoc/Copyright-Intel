@@ -93,6 +93,7 @@ body {
   font-size: 12px;
   font-weight: 600;
   letter-spacing: 0.06em;
+  margin-left: 28rem;
   color: var(--text-dim);
 }
 
@@ -844,6 +845,8 @@ body {
 .topbar .logo-box {
   width: 38px; height: 38px; border-radius: 12px;
   box-shadow: 0 6px 20px rgba(99,128,255,0.45), 0 0 0 1px rgba(255,255,255,0.12) inset;
+  margin-left: 32rem;
+  margin-right: -28rem;
 }
 .topbar .brand-label {
   font-family: 'Space Grotesk', sans-serif;

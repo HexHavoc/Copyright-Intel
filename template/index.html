@@ -15,72 +15,125 @@
 <div class="bg-grid" aria-hidden="true"></div>
 
 <div class="page landing-page">
-  <header class="header">
+
+  <!-- Navbar -->
+  <header class="topbar">
     <div class="brand-row">
       <div class="logo-box">
-        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M9 18V5l12-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="18" cy="16" r="3"/></svg>
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M9 18V5l12-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="18" cy="16" r="3"/></svg>
       </div>
-      <span class="brand-label">Copyright-Intel</span>
+      <span class="brand-label">Copyright<b>-Intel</b></span>
     </div>
     <nav class="top-nav">
-      <a href="index.html" class="nav-link active">Check</a>
-      <a href="discover/discover.html" class="nav-link">Discover</a>
-      <a href="analytics/analytics.html" class="nav-link">Analytics</a>
+      <a href="index.html" class="nav-link active">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><path d="m9 12 2 2 4-4"/></svg>
+        Check
+      </a>
+      <a href="discover/discover.html" class="nav-link">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="m16.2 7.8-2.1 6.3-6.3 2.1 2.1-6.3z"/></svg>
+        Discover
+      </a>
+      <a href="analytics/analytics.html" class="nav-link">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 3v18h18"/><path d="M7 15v3M12 9v9M17 5v13"/></svg>
+        Analytics
+      </a>
     </nav>
-    <h1 class="headline">Know before<br>you upload.</h1>
-    <p class="subhead">
-      Audit audio licensing, verify track copyright claims, inspect release metadata, and discover safe alternatives.
-    </p>
   </header>
 
-  <!-- Mode switcher -->
-  <div class="mode-tabs" role="tablist">
-    <button class="mode-tab active" data-mode="url" role="tab" aria-selected="true">
-      <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>
-      Paste URL
-    </button>
-    <button class="mode-tab" data-mode="mic" role="tab" aria-selected="false">
-      <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/><line x1="12" y1="19" x2="12" y2="23"/><line x1="8" y1="23" x2="16" y2="23"/></svg>
-      Listen for Song
-    </button>
-  </div>
+  <!-- Hero -->
+  <main class="hero">
 
-  <!-- URL panel -->
-  <div id="urlPanel" class="mode-panel">
-    <div class="input-bar">
-      <svg class="search-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>
-      <input id="urlInput" type="text" placeholder="https://www.youtube.com/watch?v=..." class="url-input" spellcheck="false" autocomplete="off" />
-      <button id="checkBtn" class="check-btn">
-        <span>Analyze Track</span>
-        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
-      </button>
-    </div>
-  </div>
+    <!-- Left: what this is -->
+    <section class="hero-copy">
+      <span class="eyebrow">Audio rights checker</span>
+      <h1 class="headline">Know before<br><span class="hl">you upload.</span></h1>
+      <p class="subhead">
+        Audit audio licensing, verify track copyright claims, inspect release metadata, and discover safe alternatives.
+      </p>
+      <ul class="feature-list">
+        <li><span class="tick"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg></span>Licensing audit</li>
+        <li><span class="tick"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg></span>Copyright claims</li>
+        <li><span class="tick"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg></span>Release metadata</li>
+        <li><span class="tick"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg></span>Safe alternatives</li>
+      </ul>
+    </section>
 
-  <!-- Mic panel -->
-  <div id="micPanel" class="mode-panel hidden">
-    <div class="mic-bar">
-      <div class="mic-left">
-        <button id="micBtn" class="mic-btn" aria-label="Start listening">
-          <span class="mic-ring"></span>
-          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/><line x1="12" y1="19" x2="12" y2="23"/><line x1="8" y1="23" x2="16" y2="23"/></svg>
+    <!-- Right: the tool -->
+    <section class="tool-card" aria-label="Check a track">
+      <div class="tool-head">
+        <h2 class="tool-title">Check a track</h2>
+        <p class="tool-sub">Choose how you want to identify the song.</p>
+      </div>
+
+      <!-- Mode switcher -->
+      <div class="mode-tabs" role="tablist">
+        <button class="mode-tab active" data-mode="url" role="tab" aria-selected="true">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>
+          Paste URL
         </button>
-        <div class="mic-copy">
-          <p id="micStatus" class="mic-status">Tap to listen</p>
-          <p class="mic-hint">Play the song near your mic — we'll capture 8 seconds</p>
+        <button class="mode-tab" data-mode="mic" role="tab" aria-selected="false">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/><line x1="12" y1="19" x2="12" y2="23"/><line x1="8" y1="23" x2="16" y2="23"/></svg>
+          Listen for Song
+        </button>
+      </div>
+
+      <!-- URL panel -->
+      <div id="urlPanel" class="mode-panel">
+        <div class="input-bar">
+          <svg class="search-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>
+          <input id="urlInput" type="text" placeholder="https://www.youtube.com/watch?v=..." class="url-input" spellcheck="false" autocomplete="off" />
+          <button id="checkBtn" class="check-btn">
+            <span>Analyze Track</span>
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
+          </button>
         </div>
       </div>
-      <select id="micSeconds" class="mic-seconds">
-        <option value="8">8s</option>
-        <option value="12">12s</option>
-        <option value="20">20s</option>
-      </select>
+
+      <!-- Mic panel -->
+      <div id="micPanel" class="mode-panel hidden">
+        <div class="mic-bar">
+          <div class="mic-left">
+            <button id="micBtn" class="mic-btn" aria-label="Start listening">
+              <span class="mic-ring"></span>
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/><line x1="12" y1="19" x2="12" y2="23"/><line x1="8" y1="23" x2="16" y2="23"/></svg>
+            </button>
+            <div class="mic-copy">
+              <p id="micStatus" class="mic-status">Tap to listen</p>
+              <p class="mic-hint">Play the song near your mic, then pick how long to listen</p>
+            </div>
+          </div>
+          <select id="micSeconds" class="mic-seconds" aria-label="Listening time">
+            <option value="8">8s</option>
+            <option value="12">12s</option>
+            <option value="20">20s</option>
+          </select>
+        </div>
+      </div>
+
+      <div id="errorMsg" class="error-msg hidden"></div>
+
+      <div id="waveformWrap" class="waveform state-idle" aria-hidden="true"></div>
+
+      <p class="tool-foot">Works with YouTube links. Results open on the next page.</p>
+    </section>
+  </main>
+
+  <!-- Verdict key -->
+  <section class="verdict-strip" aria-label="What the results mean">
+    <div class="strip-label">Your result<span>What each verdict means</span></div>
+    <div class="verdict-item clear">
+      <p class="verdict-name"><i></i>Not Copyrighted</p>
+      <p class="verdict-desc">No copyright signals found. Looks safe to use.</p>
     </div>
-  </div>
-
-  <div id="errorMsg" class="error-msg hidden"></div>
-
-  <div id="waveformWrap" class="waveform state-idle" aria-hidden="true"></div>
+    <div class="verdict-item verify">
+      <p class="verdict-name"><i></i>Verify Terms</p>
+      <p class="verdict-desc">Unclear signals. Check the license before you upload.</p>
+    </div>
+    <div class="verdict-item claim">
+      <p class="verdict-name"><i></i>Copyrighted</p>
+      <p class="verdict-desc">Protected content. May trigger a claim or takedown.</p>
+    </div>
+  </section>
 
   <footer class="footer">
     <div class="footer-status">

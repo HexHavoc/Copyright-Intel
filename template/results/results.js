@@ -16,27 +16,51 @@ const YOUTUBE_CATEGORIES = {
   "29": "Nonprofits & Activism"
 };
 
+const PLAY_ICON = '<svg width="13" height="13" viewBox="0 0 24 24" fill="currentColor" stroke="currentColor" stroke-width="2" stroke-linejoin="round"><polygon points="6 3 20 12 6 21 6 3"/></svg>';
+
+function setText(id, value) {
+  const el = document.getElementById(id);
+  el.textContent = value;
+  // Full text on hover for values that get truncated with an ellipsis
+  el.title = value;
+}
+
 document.addEventListener('DOMContentLoaded', () => {
   const storedData = sessionStorage.getItem('auditResult');
 
   if (!storedData) {
-
     window.location.href = '../index.html';
     return;
   }
 
-  const data = JSON.parse(storedData);
+  let data;
+  try {
+    data = JSON.parse(storedData);
+  } catch (e) {
+    window.location.href = '../index.html';
+    return;
+  }
 
-  document.getElementById('resTitle').textContent = data.title || 'Untitled Track';
-  document.getElementById('resChannel').textContent = data.channel ? `Uploaded by ${data.channel}` : 'Unknown Creator';
+  const title = data.title || 'Untitled Track';
+  setText('resTitle', title);
+  setText('resChannel', data.channel ? `Uploaded by ${data.channel}` : 'Unknown Creator');
+  document.title = `${title} | Analysis Report`;
+
+  // Verdict: badge + panel accent colour (clear / verify / claim)
+  const verdict = data.verdict || '';
+  document.getElementById('verdictPanel').dataset.verdict = verdict;
 
   const badge = document.getElementById('verdictBadge');
-  badge.innerHTML = `<i class="dot"></i>${data.badge_text}`;
-  badge.className = `badge badge-${data.verdict}`;
+  badge.className = `badge badge-${verdict}`;
+  badge.textContent = '';
+  const dot = document.createElement('i');
+  dot.className = 'dot';
+  badge.appendChild(dot);
+  badge.appendChild(document.createTextNode(data.badge_text || ''));
 
-  document.getElementById('verdictMessage').textContent = data.message;
-  document.getElementById('genreVal').textContent = data.genre || 'Unspecified';
-  document.getElementById('licenseVal').textContent = data.license_note || 'Standard License';
+  document.getElementById('verdictMessage').textContent = data.message || '';
+  setText('genreVal', data.genre || 'Unspecified');
+  setText('licenseVal', data.license_note || 'Standard License');
 
   if (data.published_date) {
     const formattedDate = new Date(data.published_date).toLocaleDateString('en-US', {
@@ -44,43 +68,87 @@ document.addEventListener('DOMContentLoaded', () => {
       month: 'short',
       day: 'numeric'
     });
-    document.getElementById('publishedVal').textContent = formattedDate;
+    setText('publishedVal', formattedDate);
   } else {
-    document.getElementById('publishedVal').textContent = 'Unknown';
+    setText('publishedVal', 'Unknown');
   }
 
   const categoryName = YOUTUBE_CATEGORIES[data.category_id] || `ID #${data.category_id}`;
-  document.getElementById('categoryVal').textContent = categoryName;
+  setText('categoryVal', categoryName);
 
-  document.getElementById('kidsVal').textContent = data.made_for_kids
+  setText('kidsVal', data.made_for_kids
     ? 'Designed specifically for Children (COPPA strict)'
-    : 'Standard Audience / General Content';
+    : 'Standard Audience / General Content');
 
+  // Recommendations
   const recsWrap = document.getElementById('recsWrap');
   const recsList = document.getElementById('recsList');
+  const recsEmpty = document.getElementById('recsEmpty');
+  const recsCount = document.getElementById('recsCount');
   recsList.innerHTML = '';
 
-  if (data.recommendations && data.recommendations.length > 0) {
+  const recs = Array.isArray(data.recommendations)
+    ? data.recommendations.filter(r => r && /^https?:\/\//i.test(r.url || ''))
+    : [];
+
+  if (recs.length > 0) {
     recsWrap.classList.remove('hidden');
-    data.recommendations.forEach(rec => {
+    recsEmpty.classList.add('hidden');
+    recsCount.textContent = `${recs.length} found`;
+    recsCount.classList.remove('hidden');
+
+    recs.forEach((rec, i) => {
       const row = document.createElement('a');
       row.href = rec.url;
-      row.target = "_blank";
-      row.rel = "noopener noreferrer";
-      row.className = "rec-row";
-      row.innerHTML = `
-        <div class="rec-info">
-          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><polygon points="5 3 19 12 5 21 5 3"/></svg>
-          <div>
-            <p class="rec-title">${rec.title}</p>
-            <p class="rec-channel">${rec.channel}</p>
-          </div>
-        </div>
-        <span class="rec-free-tag">COPYRIGHT FREE</span>
-      `;
+      row.target = '_blank';
+      row.rel = 'noopener noreferrer';
+      row.className = 'rec-row';
+      row.style.animationDelay = `${i * 60}ms`;
+
+      const info = document.createElement('div');
+      info.className = 'rec-info';
+
+      const play = document.createElement('span');
+      play.className = 'rec-play';
+      play.innerHTML = PLAY_ICON;
+
+      const text = document.createElement('div');
+      const recTitle = document.createElement('p');
+      recTitle.className = 'rec-title';
+      recTitle.textContent = rec.title || 'Untitled';
+      const recChannel = document.createElement('p');
+      recChannel.className = 'rec-channel';
+      recChannel.textContent = rec.channel || '';
+      text.appendChild(recTitle);
+      text.appendChild(recChannel);
+
+      info.appendChild(play);
+      info.appendChild(text);
+
+      const tag = document.createElement('span');
+      tag.className = 'rec-free-tag';
+      tag.textContent = 'COPYRIGHT FREE';
+
+      row.appendChild(info);
+      row.appendChild(tag);
       recsList.appendChild(row);
     });
   } else {
     recsWrap.classList.add('hidden');
+    recsCount.classList.add('hidden');
+    recsEmpty.classList.remove('hidden');
+
+    const emptyTitle = document.getElementById('recsEmptyTitle');
+    const emptyText = document.getElementById('recsEmptyText');
+
+    if (verdict === 'clear') {
+      emptyTitle.textContent = 'No replacement needed';
+      emptyText.textContent = 'This track looks safe to use, so no alternatives were suggested.';
+      emptyText.classList.remove('hidden');
+    } else {
+      emptyTitle.textContent = 'No alternatives found';
+      emptyText.textContent = '';
+      emptyText.classList.add('hidden');
+    }
   }
 });

@@ -7,40 +7,34 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&family=Space+Grotesk:wght@500;600;700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="results.css">
+  <link rel="stylesheet" href="../styles.css">
 </head>
 <body>
 
 <div class="bg-glow" aria-hidden="true"></div>
 <div class="bg-grid" aria-hidden="true"></div>
 
-<div class="page">
-  <!-- Top Navigation -->
-  <nav class="top-nav">
-    <a href="../index.html" class="back-link">
-      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
-      <span>Scan another track</span>
-    </a>
-    <div class="brand-pill">Audit Report</div>
-  </nav>
+<div class="page results-page">
 
-  <!-- Results Content -->
-  <main id="resultsContent">
-    <div class="result-card">
-      <div class="result-top">
-        <div class="result-meta">
-          <span class="sub-label">Track Overview</span>
-          <h2 id="resTitle" class="result-title">—</h2>
-          <p id="resChannel" class="result-channel">—</p>
-        </div>
-        <span id="verdictBadge" class="badge"><i class="dot"></i>—</span>
+  <!-- Results: overview on the left, alternatives on the right -->
+  <main id="resultsContent" class="results-split">
+
+    <!-- Left: track overview + verdict + metadata -->
+    <section id="verdictPanel" class="rp verdict-panel" data-verdict="" aria-label="Track overview">
+      <div class="rp-head">
+        <span class="eyebrow">Audit report</span>
+        <h1 id="resTitle" class="result-title">—</h1>
+        <p id="resChannel" class="result-channel">—</p>
       </div>
 
-      <div class="verdict-banner">
-        <div class="verdict-icon">
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>
+      <div class="verdict-hero">
+        <div class="vh-icon">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><path d="m9 12 2 2 4-4"/></svg>
         </div>
-        <p id="verdictMessage" class="verdict-message">—</p>
+        <div class="vh-body">
+          <span id="verdictBadge" class="badge"><i class="dot"></i>—</span>
+          <p id="verdictMessage" class="verdict-message">—</p>
+        </div>
       </div>
 
       <!-- Metadata Grid -->
@@ -85,16 +79,29 @@
           <span id="kidsVal" class="meta-val">—</span>
         </div>
       </div>
-    </div>
 
-    <!-- Recommendations -->
-    <div id="recsWrap" class="recs-wrap hidden">
-      <div class="recs-header">
-        <span class="signal-dot"></span>
-        <h3 class="recs-heading">Recommended Copyright-Free Alternatives</h3>
+      <div class="rp-actions">
+        <a href="../index.html" class="check-btn scan-btn">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
+          <span>Scan another track</span>
+        </a>
       </div>
-      <div id="recsList" class="recs-list"></div>
-    </div>
+    </section>
+
+    <!-- Right: copyright-free alternatives -->
+    <section class="rp recs-panel" aria-label="Copyright-free alternatives">
+      <div class="panel-head">
+        <div>
+          <h2 class="panel-title">Copyright-free alternatives</h2>
+          <p class="panel-sub">Safe tracks you can use instead.</p>
+        </div>
+        <span id="recsCount" class="panel-tag hidden">0 found</span>
+      </div>
+
+      <div id="recsWrap" class="recs-wrap hidden">
+        <div id="recsList" class="recs-list"></div>
+  
+    </section>
   </main>
 
   <footer class="footer">

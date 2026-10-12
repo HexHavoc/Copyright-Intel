@@ -465,7 +465,7 @@ def check_song(payload: CheckRequest):
 
 
 @app.post("/api/recognize")
-def recognize_song(seconds: int = 8):
+def recognize_song(seconds: int = 5):
     """
     Records a clip from the server's microphone, identifies it via
     Shazam (using song_recognizer.py), then runs it through the exact

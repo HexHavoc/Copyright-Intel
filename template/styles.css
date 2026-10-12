@@ -93,7 +93,6 @@ body {
   font-size: 12px;
   font-weight: 600;
   letter-spacing: 0.06em;
-  margin-left: 28rem;
   color: var(--text-dim);
 }
 
@@ -845,8 +844,6 @@ body {
 .topbar .logo-box {
   width: 38px; height: 38px; border-radius: 12px;
   box-shadow: 0 6px 20px rgba(99,128,255,0.45), 0 0 0 1px rgba(255,255,255,0.12) inset;
-  margin-left: 32rem;
-  margin-right: -28rem;
 }
 .topbar .brand-label {
   font-family: 'Space Grotesk', sans-serif;
@@ -2052,6 +2049,19 @@ body {
 .rec-row:hover .rec-play svg { color: inherit; }
 .rec-row:hover .rec-play { color: #07110D; }
 
+/* Empty-state message in the alternatives box, tinted by verdict */
+.recs-panel .results-placeholder span { max-width: 340px; }
+.recs-panel .results-placeholder[data-state="verify"] .ph-icon {
+  color: var(--verify);
+  background: rgba(255,174,51,0.1);
+  border-color: rgba(255,174,51,0.28);
+}
+.recs-panel .results-placeholder[data-state="claim"] .ph-icon {
+  color: var(--claim);
+  background: rgba(255,82,108,0.1);
+  border-color: rgba(255,82,108,0.28);
+}
+
 .results-page .footer { margin-top: 0; padding-top: 12px; }
 
 /* Short laptop screens: tighten so everything still fits */
@@ -2089,3 +2099,4 @@ body {
   .rp-actions { flex-direction: column; }
   .recs-panel .rec-free-tag { display: none; }
 }
+

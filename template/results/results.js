@@ -81,11 +81,16 @@ document.addEventListener('DOMContentLoaded', () => {
     : 'Standard Audience / General Content');
 
   // Recommendations
+  const panel = document.querySelector('.recs-panel');   // the alternatives box
   const recsWrap = document.getElementById('recsWrap');
   const recsList = document.getElementById('recsList');
-  const recsEmpty = document.getElementById('recsEmpty');
-  const recsCount = document.getElementById('recsCount');
+  const recsCount = document.getElementById('recsCount'); // optional
   recsList.innerHTML = '';
+
+  // Clear any message from a previous render, and drop the old #recsEmpty block if a page still has it
+  panel.querySelectorAll('.recs-message').forEach(el => el.remove());
+  const legacyEmpty = document.getElementById('recsEmpty');
+  if (legacyEmpty) legacyEmpty.remove();
 
   const recs = Array.isArray(data.recommendations)
     ? data.recommendations.filter(r => r && /^https?:\/\//i.test(r.url || ''))
@@ -93,9 +98,10 @@ document.addEventListener('DOMContentLoaded', () => {
 
   if (recs.length > 0) {
     recsWrap.classList.remove('hidden');
-    recsEmpty.classList.add('hidden');
-    recsCount.textContent = `${recs.length} found`;
-    recsCount.classList.remove('hidden');
+    if (recsCount) {
+      recsCount.textContent = `${recs.length} found`;
+      recsCount.classList.remove('hidden');
+    }
 
     recs.forEach((rec, i) => {
       const row = document.createElement('a');
@@ -135,20 +141,48 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   } else {
     recsWrap.classList.add('hidden');
-    recsCount.classList.add('hidden');
-    recsEmpty.classList.remove('hidden');
+    if (recsCount) recsCount.classList.add('hidden');
 
-    const emptyTitle = document.getElementById('recsEmptyTitle');
-    const emptyText = document.getElementById('recsEmptyText');
+    // Message shown inside the alternatives box when there is nothing to list
+    const svg = (paths) =>
+      `<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">${paths}</svg>`;
 
-    if (verdict === 'clear') {
-      emptyTitle.textContent = 'No replacement needed';
-      emptyText.textContent = 'This track looks safe to use, so no alternatives were suggested.';
-      emptyText.classList.remove('hidden');
-    } else {
-      emptyTitle.textContent = 'No alternatives found';
-      emptyText.textContent = '';
-      emptyText.classList.add('hidden');
-    }
+    const EMPTY_MESSAGES = {
+      clear: {
+        icon: svg('<path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><path d="m9 12 2 2 4-4"/>'),
+        title: 'No replacement needed',
+        text: 'This track looks safe to use, so no alternatives were suggested.'
+      },
+      verify: {
+        icon: svg('<circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/>'),
+        title: 'Attribution required',
+        text: 'This track may be used if you credit the creator. Read the video description for the exact terms before you upload, so no alternatives were suggested.'
+      },
+      claim: {
+        icon: svg('<circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/>'),
+        title: 'No alternatives found',
+        text: 'We couldn’t find a safe copyright-free match for this track right now.'
+      }
+    };
+    const msg = EMPTY_MESSAGES[verdict] || EMPTY_MESSAGES.claim;
+
+    const box = document.createElement('div');
+    box.className = 'results-placeholder recs-message';
+    box.dataset.state = verdict;
+
+    const icon = document.createElement('div');
+    icon.className = 'ph-icon';
+    icon.innerHTML = msg.icon;
+
+    const heading = document.createElement('strong');
+    heading.textContent = msg.title;
+
+    const body = document.createElement('span');
+    body.textContent = msg.text;
+
+    box.appendChild(icon);
+    box.appendChild(heading);
+    box.appendChild(body);
+    panel.appendChild(box);
   }
 });

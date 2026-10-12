@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Analytics | Copyright-Intel</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&family=Space+Grotesk:wght@500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../styles.css">
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4"></script>
+
+</head>
+<body>
+
+<div class="bg-glow" aria-hidden="true"></div>
+<div class="bg-grid" aria-hidden="true"></div>
+
+<div class="page wide">
+  <!-- Navbar (same as index.html) -->
+  <header class="topbar">
+    <div class="brand-row">
+      <div class="logo-box">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M9 18V5l12-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="18" cy="16" r="3"/></svg>
+      </div>
+      <span class="brand-label">Copyright<b>-Intel</b></span>
+    </div>
+    <nav class="top-nav">
+      <a href="../index.html" class="nav-link">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><path d="m9 12 2 2 4-4"/></svg>
+        Check
+      </a>
+      <a href="../discover/discover.html" class="nav-link">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="m16.2 7.8-2.1 6.3-6.3 2.1 2.1-6.3z"/></svg>
+        Discover
+      </a>
+      <a href="../analytics/analytics.html" class="nav-link active">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 3v18h18"/><path d="M7 15v3M12 9v9M17 5v13"/></svg>
+        Analytics
+      </a>
+    </nav>
+  </header>
+
+  <!-- Page title -->
+  <div class="page-title">
+    <h1 class="headline">Usage <span class="hl">Analytics</span></h1>
+    <p class="subhead">A running breakdown of every track this tool has checked.</p>
+  </div>
+
+  <div id="emptyState" class="empty-state hidden">
+    <p>No checks logged yet. Run a check from the <a href="../index.html">Check</a> tab to see analytics here.</p>
+  </div>
+
+  <div id="analyticsContent">
+
+    <!-- ============ SECTION 1: COPYRIGHT CHECKS ============ -->
+    <section class="section checks">
+      <div class="section-head">
+        <div class="section-icon">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><path d="m9 12 2 2 4-4"/></svg>
+        </div>
+        <div class="section-titles">
+          <h2 class="section-title">Copyright Checks</h2>
+          <p class="section-desc">Every track checked from the Check tab, and what the verdict was.</p>
+        </div>
+        <span class="section-tag">Check tab</span>
+      </div>
+
+      <p class="group-label">Verdict totals</p>
+      <div class="stat-strip four">
+        <div class="stat-card c-total">
+          <span class="stat-label">Total Checks</span>
+          <span id="statTotal" class="stat-value">—</span>
+          <span class="stat-note">All verdicts combined</span>
+        </div>
+        <div class="stat-card c-clear">
+          <span class="stat-label">Not Copyrighted</span>
+          <span id="statClear" class="stat-value" style="color: var(--signal);">—</span>
+          <span class="stat-note">Looks safe to use</span>
+        </div>
+        <div class="stat-card c-verify">
+          <span class="stat-label">Verify Terms</span>
+          <span id="statVerify" class="stat-value" style="color: var(--verify);">—</span>
+          <span class="stat-note">Needs a manual check</span>
+        </div>
+        <div class="stat-card c-claim">
+          <span class="stat-label">Copyrighted</span>
+          <span id="statClaim" class="stat-value" style="color: var(--claim);">—</span>
+          <span class="stat-note">Protected content</span>
+        </div>
+      </div>
+
+      <p class="group-label">Breakdown &amp; history</p>
+      <div class="checks-grid">
+        <div class="chart-card verdict">
+          <p class="chart-title">Verdict Breakdown</p>
+          <p class="chart-sub">Share of each verdict</p>
+          <div class="chart-wrap"><canvas id="verdictChart"></canvas></div>
+        </div>
+        <div class="chart-card genres">
+          <p class="chart-title">Top Genres Checked</p>
+          <p class="chart-sub">Most-checked music genres</p>
+          <div class="chart-wrap"><canvas id="genreChart"></canvas></div>
+        </div>
+        <div class="chart-card trend">
+          <p class="chart-title">Checks Over the Last 7 Days</p>
+          <p class="chart-sub">Daily check volume</p>
+          <div class="chart-wrap"><canvas id="trendChart"></canvas></div>
+        </div>
+        <div class="chart-card recent">
+          <div class="recs-header" style="margin: 0 0 14px;">
+            <span class="signal-dot"></span>
+            <span class="recs-heading">Recent Checks</span>
+          </div>
+          <div id="recentList" class="recs-list"></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============ SECTION 2: DISCOVER ACTIVITY ============ -->
+    <section class="section discover">
+      <div class="section-head">
+        <div class="section-icon">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="m16.2 7.8-2.1 6.3-6.3 2.1 2.1-6.3z"/></svg>
+        </div>
+        <div class="section-titles">
+          <h2 class="section-title">Discover Activity</h2>
+          <p class="section-desc">Mood-based searches for free-to-use music from the Discover tab.</p>
+        </div>
+        <span class="section-tag">Discover tab</span>
+      </div>
+
+      <div class="discover-grid">
+        <div class="discover-stats">
+          <div class="stat-card c-clear">
+            <span class="stat-label">Mood Searches</span>
+            <span id="statDiscoveries" class="stat-value">—</span>
+            <span class="stat-note">Total searches run</span>
+          </div>
+          <div class="stat-card c-total">
+            <span class="stat-label">Avg Results / Search</span>
+            <span id="statAvgResults" class="stat-value" style="color: var(--accent);">—</span>
+            <span class="stat-note">Tracks returned per search</span>
+          </div>
+        </div>
+        <div class="chart-card">
+          <p class="chart-title">Top Moods Searched</p>
+          <p class="chart-sub">Most popular moods</p>
+          <div class="chart-wrap"><canvas id="moodChart"></canvas></div>
+        </div>
+      </div>
+    </section>
+  </div>
+
+  <footer class="footer">
+    <div class="footer-status">
+      <span class="pulse-dot"></span>
+      <span class="footer-text">YouTube Data API v3 Connected</span>
+    </div>
+    <span class="footer-text">Automated indicators · Not formal legal counsel</span>
+  </footer>
+</div>
+
+<script src="analytics.js"></script>
+</body>
+</html>

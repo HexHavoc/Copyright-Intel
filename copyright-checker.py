@@ -363,112 +363,6 @@ def find_best_youtube_match(title: str, artist: str):
     return items[0]["id"]["videoId"]
 
 
-def discover_songs_by_mood(mood: str, limit: int = 8):
-    """
-    Searches YouTube for music matching a mood/theme (e.g. "christmas",
-    "lofi study", "workout hype"), then runs EACH candidate through the
-    exact same decide_verdict() logic used everywhere else — so the
-    results you get back are only ones that are NOT flagged as fully
-    copyrighted (i.e. "clear" or "verify", never "claim").
-    """
-    query = f"{mood} music"
-
-    request = youtube.search().list(
-        part="snippet",
-        type="video",
-        videoCategoryId="10",   # Music category
-        q=query,
-        maxResults=15,          # pull extra candidates since some will get filtered out
-    )
-    response = request.execute()
-
-    results = []
-    for item in response.get("items", []):
-        video_id = item["id"]["videoId"]
-
-        try:
-            video = get_video_details(video_id)
-        except HTTPException:
-            continue  # skip videos that failed to load details
-
-        verdict = decide_verdict(video)
-        if verdict["verdict"] == "claim":
-            continue  # skip anything fully copyrighted — only want safe results here
-
-        genre = get_genre(video["title"])
-
-        results.append({
-            "title": video["title"],
-            "channel": video["channel"],
-            "url": f"https://www.youtube.com/watch?v={video_id}",
-            "verdict": verdict["verdict"],
-            "badge_text": verdict["badge_text"],
-            "genre": genre,
-        })
-
-        if len(results) >= limit:
-            break
-
-    return results
-
-
-@app.get("/api/discover")
-def discover_by_mood(mood: str, limit: int = 8):
-    """
-    GET /api/discover?mood=christmas
-    GET /api/discover?mood=lofi+study&limit=10
-    """
-    if not mood or not mood.strip():
-        raise HTTPException(status_code=400, detail="Please provide a mood or theme to search for.")
-
-    results = discover_songs_by_mood(mood.strip(), limit)
-    return {"mood": mood, "results": results}
-
-
-@app.post("/api/check")
-def check_song(payload: CheckRequest):
-    video_id = extract_video_id(payload.url)
-    if video_id is None:
-        raise HTTPException(status_code=400, detail="Invalid YouTube URL.")
-
-    return run_check_pipeline(video_id)
-
-
-@app.post("/api/recognize")
-def recognize_song(seconds: int = 8):
-    """
-    Records a clip from the server's microphone, identifies it via
-    Shazam (using song_recognizer.py), then runs it through the exact
-    same check pipeline as /api/check.
-    """
-    clip_path = record_clip(seconds)
-
-    try:
-        match = asyncio.run(identify_song(clip_path))
-    finally:
-        os.remove(clip_path)
-
-    if match is None:
-        raise HTTPException(status_code=404, detail="Couldn't identify the song. Try again with a clearer recording.")
-
-    video_id = find_best_youtube_match(match["title"], match["artist"])
-    if video_id is None:
-        raise HTTPException(
-            status_code=404,
-            detail=f"Identified '{match['title']}' by {match['artist']}, but couldn't find it on YouTube."
-        )
-
-    result = run_check_pipeline(video_id, source="microphone")
-    result["recognized_via"] = "microphone"
-    result["shazam_match"] = match
-    return result
-
-
-@app.get("/health")
-def health_check():
-    return {"status": "ok"}
-
-
 def discover_by_mood(mood: str, limit: int = 9):
     """
     Searches YouTube for music matching a mood/theme (e.g. "christmas",
@@ -542,19 +436,70 @@ def discover_by_mood(mood: str, limit: int = 9):
     return results
 
 
+
+
+
 @app.get("/api/discover")
-def discover_songs(mood: str, limit: int = 9):
+def discover_songs_by_mood(mood: str, limit: int = 8):
     """
     GET /api/discover?mood=christmas
-    Returns copyright-free / attribution-required tracks matching the
-    given mood or theme.
+    GET /api/discover?mood=lofi+study&limit=10
     """
     if not mood or not mood.strip():
-        raise HTTPException(status_code=400, detail="Mood/concept can't be empty.")
+        raise HTTPException(status_code=400, detail="Please provide a mood or theme to search for.")
 
     results = discover_by_mood(mood.strip(), limit)
-    log_discovery(mood=mood.strip(), result_count=len(results))
-    return {"mood": mood.strip(), "results": results}
+
+    log_discovery(mood=mood, result_count=len(results))
+
+    return {"mood": mood, "results": results}
+
+
+@app.post("/api/check")
+def check_song(payload: CheckRequest):
+    video_id = extract_video_id(payload.url)
+    if video_id is None:
+        raise HTTPException(status_code=400, detail="Invalid YouTube URL.")
+
+    return run_check_pipeline(video_id)
+
+
+@app.post("/api/recognize")
+def recognize_song(seconds: int = 8):
+    """
+    Records a clip from the server's microphone, identifies it via
+    Shazam (using song_recognizer.py), then runs it through the exact
+    same check pipeline as /api/check.
+    """
+    clip_path = record_clip(seconds)
+
+    try:
+        match = asyncio.run(identify_song(clip_path))
+    finally:
+        os.remove(clip_path)
+
+    if match is None:
+        raise HTTPException(status_code=404, detail="Couldn't identify the song. Try again with a clearer recording.")
+
+    video_id = find_best_youtube_match(match["title"], match["artist"])
+    if video_id is None:
+        raise HTTPException(
+            status_code=404,
+            detail=f"Identified '{match['title']}' by {match['artist']}, but couldn't find it on YouTube."
+        )
+
+    result = run_check_pipeline(video_id, source="microphone")
+    result["recognized_via"] = "microphone"
+    result["shazam_match"] = match
+    return result
+
+
+@app.get("/health")
+def health_check():
+    return {"status": "ok"}
+
+
+
 
 
 @app.get("/api/analytics")

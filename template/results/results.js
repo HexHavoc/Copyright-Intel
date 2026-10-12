@@ -78,7 +78,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
   setText('kidsVal', data.made_for_kids
     ? 'Designed specifically for Children (COPPA strict)'
-    : 'Standard Audience / General Content');
+    : 'Standard Audience(Not Made Specifically For Children)');
 
   // Recommendations
   const panel = document.querySelector('.recs-panel');   // the alternatives box

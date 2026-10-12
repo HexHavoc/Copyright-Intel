@@ -8,16 +8,13 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&family=Space+Grotesk:wght@500;600;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="styles.css">
-  <style>
-    /* Tool card now fills the full hero width (left copy removed) */
-    .hero { display: block; grid-template-columns: 1fr; }
-    .hero .tool-card { width: 100%; max-width: none; margin: 0; }
-  </style>
 </head>
 <body>
 
 <div class="bg-glow" aria-hidden="true"></div>
 <div class="bg-grid" aria-hidden="true"></div>
+<div class="aurora aurora-a" aria-hidden="true"></div>
+<div class="aurora aurora-b" aria-hidden="true"></div>
 
 <div class="page landing-page">
 
@@ -48,11 +45,25 @@
   <!-- Hero -->
   <main class="hero">
 
-    <!-- The tool (full width) -->
+    <div class="hero-intro">
+      <h1 class="headline">Know before you <span class="hl">upload.</span></h1>
+      <ul class="intro-chips">
+        <li><span class="tick"><svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg></span>Copyright verdict</li>
+        <li><span class="tick"><svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg></span>Safe alternatives</li>
+        <li><span class="tick"><svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg></span>Identify by listening</li>
+      </ul>
+    </div>
+
+    <!-- The tool -->
     <section class="tool-card" aria-label="Check a track">
       <div class="tool-head">
-        <h2 class="tool-title">Check a track</h2>
-        <p class="tool-sub">Choose how you want to identify the song.</p>
+        <div class="tool-icon">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><path d="m9 12 2 2 4-4"/></svg>
+        </div>
+        <div>
+          <h2 class="tool-title">Check a track</h2>
+          <p class="tool-sub">Choose how you want to identify the song.</p>
+        </div>
       </div>
 
       <!-- Mode switcher -->

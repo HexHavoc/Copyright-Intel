@@ -8,6 +8,11 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&family=Space+Grotesk:wght@500;600;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="styles.css">
+  <style>
+    /* Tool card now fills the full hero width (left copy removed) */
+    .hero { display: block; grid-template-columns: 1fr; }
+    .hero .tool-card { width: 100%; max-width: none; margin: 0; }
+  </style>
 </head>
 <body>
 
@@ -43,22 +48,7 @@
   <!-- Hero -->
   <main class="hero">
 
-    <!-- Left: what this is -->
-    <section class="hero-copy">
-      <span class="eyebrow">Audio rights checker</span>
-      <h1 class="headline">Know before<br><span class="hl">you upload.</span></h1>
-      <p class="subhead">
-        Audit audio licensing, verify track copyright claims, inspect release metadata, and discover safe alternatives.
-      </p>
-      <ul class="feature-list">
-        <li><span class="tick"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg></span>Licensing audit</li>
-        <li><span class="tick"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg></span>Copyright claims</li>
-        <li><span class="tick"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg></span>Release metadata</li>
-        <li><span class="tick"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg></span>Safe alternatives</li>
-      </ul>
-    </section>
-
-    <!-- Right: the tool -->
+    <!-- The tool (full width) -->
     <section class="tool-card" aria-label="Check a track">
       <div class="tool-head">
         <h2 class="tool-title">Check a track</h2>

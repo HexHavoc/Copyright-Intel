@@ -2243,29 +2243,33 @@ body {
   position: absolute; inset: -1px;
   z-index: -1;
   border-radius: inherit;
-  border: 2px solid transparent;
+  border: 3px solid transparent;
   background:
     linear-gradient(180deg, var(--edge-fill-top), var(--edge-fill-bottom)) padding-box,
     conic-gradient(from var(--ang),
       var(--edge-blue), var(--edge-red), var(--edge-yellow), var(--edge-green), var(--edge-blue)) border-box;
-  animation: spinRing 8s linear infinite;
+  animation: spinRing 2.5s linear infinite;
   pointer-events: none;
 }
 
 /* Soft glow: the same colours, blurred, sitting behind the ring and bleeding outward. */
 .landing-page .tool-card::after {
   content: "";
-  position: absolute; inset: -2px;
+  position: absolute; inset: -4px;
   z-index: -2;
   border-radius: inherit;
   background: conic-gradient(from var(--ang),
     var(--edge-blue), var(--edge-red), var(--edge-yellow), var(--edge-green), var(--edge-blue));
-  filter: blur(20px);
-  opacity: 0.6;
-  animation: spinRing 8s linear infinite;
+  filter: blur(26px);
+  opacity: 0.9;
+  animation: spinRing 2.5s linear infinite, glowPulse 2.6s ease-in-out infinite alternate;
   pointer-events: none;
 }
 @keyframes spinRing { to { --ang: 360deg; } }
+@keyframes glowPulse {
+  from { opacity: 0.65; transform: scale(1); }
+  to   { opacity: 1;    transform: scale(1.025); }
+}
 
 .landing-page .tool-head { display: flex; align-items: center; gap: 14px; margin-bottom: 18px; }
 .tool-icon {

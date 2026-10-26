@@ -2215,8 +2215,17 @@ body {
   background: rgba(49, 224, 150, 0.12);
 }
 
-/* ---------- Tool card with a travelling light around the edge ---------- */
+/* ---------- Tool card: neon edge that flows through four colours ----------
+   Blue, red, yellow and green travel around the border and spill a soft glow
+   outside it. Change the four colours here to re-tint the whole effect.        */
 .landing-page .tool-card {
+  --edge-blue:   #2F7BFF;
+  --edge-red:    #FF4560;
+  --edge-yellow: #FFD84D;
+  --edge-green:  #22D66B;
+  --edge-fill-top: #191D29;        /* solid card colour that sits inside the ring */
+  --edge-fill-bottom: #0F1118;
+
   position: relative;
   width: 100%;
   max-width: var(--card-max);
@@ -2225,21 +2234,35 @@ body {
   border-radius: 24px;
   border: 1px solid transparent;
   background: linear-gradient(180deg, rgba(25, 29, 41, 0.82), rgba(15, 17, 24, 0.82));
-  box-shadow: 0 50px 100px -40px rgba(99, 128, 255, 0.38), 0 30px 60px -30px rgba(0, 0, 0, 0.7);
+  box-shadow: 0 40px 80px -40px rgba(0, 0, 0, 0.85);
 }
+
+/* Crisp ring. The interior is painted solid so the glow underneath can't tint the card. */
 .landing-page .tool-card::before {
   content: "";
-  position: absolute; inset: 0;
+  position: absolute; inset: -1px;
+  z-index: -1;
   border-radius: inherit;
-  padding: 1.5px;
+  border: 2px solid transparent;
+  background:
+    linear-gradient(180deg, var(--edge-fill-top), var(--edge-fill-bottom)) padding-box,
+    conic-gradient(from var(--ang),
+      var(--edge-blue), var(--edge-red), var(--edge-yellow), var(--edge-green), var(--edge-blue)) border-box;
+  animation: spinRing 8s linear infinite;
+  pointer-events: none;
+}
+
+/* Soft glow: the same colours, blurred, sitting behind the ring and bleeding outward. */
+.landing-page .tool-card::after {
+  content: "";
+  position: absolute; inset: -2px;
+  z-index: -2;
+  border-radius: inherit;
   background: conic-gradient(from var(--ang),
-    rgba(255, 255, 255, 0.08) 0deg, rgba(255, 255, 255, 0.08) 200deg,
-    var(--accent) 260deg, var(--signal) 310deg,
-    rgba(255, 255, 255, 0.08) 360deg);
-  -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
-  -webkit-mask-composite: xor;
-          mask-composite: exclude;
-  animation: spinRing 7s linear infinite;
+    var(--edge-blue), var(--edge-red), var(--edge-yellow), var(--edge-green), var(--edge-blue));
+  filter: blur(20px);
+  opacity: 0.6;
+  animation: spinRing 8s linear infinite;
   pointer-events: none;
 }
 @keyframes spinRing { to { --ang: 360deg; } }
@@ -2337,6 +2360,7 @@ body {
   .aurora,
   .hero-intro .headline .hl,
   .landing-page .tool-card::before,
+  .landing-page .tool-card::after,
   .landing-page .tool-card .check-btn::after,
   .live-dot { animation: none !important; }
   .landing-page .tool-card .waveform.state-idle span { animation: none !important; transform: scaleY(0.3); }

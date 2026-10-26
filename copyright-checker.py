@@ -141,6 +141,8 @@ def get_video_details(video_id: str):
     video = response["items"][0]
 
 
+
+
     return {
         "title": video["snippet"]["title"],
         "published_date": video["snippet"]["publishedAt"],
@@ -248,6 +250,7 @@ def is_safe_alternative(video_item: dict) -> bool:
             "licensed_content": item["contentDetails"]["licensedContent"],
             "video_license": item["status"].get("license"),
         }
+
 
         # Check against verdict rules
         verdict = decide_verdict(temp_video_data)
